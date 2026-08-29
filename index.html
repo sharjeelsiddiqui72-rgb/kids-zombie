@@ -218,6 +218,50 @@
             transform: scale(1.05);
             box-shadow: 0 0 25px rgba(46,204,113,1);
         }
+        .name-input {
+            padding: 10px 15px;
+            font-size: clamp(1rem, 3vw, 1.4rem);
+            font-family: inherit;
+            border: 2px solid #2ecc71;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            text-align: center;
+            margin-bottom: 12px;
+            width: 100%;
+            max-width: 280px;
+            outline: none;
+        }
+        .leaderboard-box {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #ffcc00;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-top: 15px;
+            width: 100%;
+            max-width: 320px;
+            text-align: left;
+            box-shadow: 0 0 15px rgba(255,204,0,0.3);
+        }
+        .leaderboard-title {
+            color: #ffcc00;
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px #000;
+        }
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            color: #fff;
+            font-size: 0.95rem;
+            padding: 3px 0;
+            border-bottom: 1px dashed rgba(255,255,255,0.2);
+        }
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -261,16 +305,27 @@
         <div class="screen-content">
             <h1>ZOMBIES KILLER</h1>
             <p>DAYLIGHT GARDEN EDITION</p>
-            <p style="font-size: clamp(0.8rem, 2vw, 1rem); color: #ffff00; margin-top: 8px;">Tap/Click to Shoot | Use Reload Button</p>
+            <input type="text" id="player-name-input" class="name-input" placeholder="Enter Your Name (Blank = HM-AURA)" maxlength="15">
             <button class="arcade-btn" onclick="startGame()">START MISSION</button>
+            
+            <div class="leaderboard-box">
+                <div class="leaderboard-title">🏆 TOP 3 HIGH SCORES 🏆</div>
+                <div id="leaderboard-list"></div>
+            </div>
         </div>
     </div>
 
     <!-- Game Over Screen -->
     <div id="game-over-screen" class="screen" style="display: none;">
         <h1 style="color: #ff2222; text-shadow: 0 0 15px #990000;">YOU DIED</h1>
+        <p>Player: <span id="game-over-player" style="color: #ffff00;"></span></p>
         <p>Final Score: <span id="final-score">0</span></p>
         <button class="arcade-btn" onclick="startGame()">PLAY AGAIN</button>
+        
+        <div class="leaderboard-box">
+            <div class="leaderboard-title">🏆 TOP 3 HIGH SCORES 🏆</div>
+            <div id="gameover-leaderboard-list"></div>
+        </div>
     </div>
 
     <script>
@@ -287,6 +342,7 @@
         let backgroundMusicInterval = null;
         let spawnTimer = 0;
         let birdSpawnTimer = 0;
+        let currentPlayer = "HM-AURA";
 
         const scoreEl = document.getElementById('score');
         const livesEl = document.getElementById('lives');
@@ -298,6 +354,42 @@
         const hudEl = document.getElementById('hud');
         const flashScreen = document.getElementById('flash');
         const reloadWarning = document.getElementById('reload-warning');
+        const playerNameInput = document.getElementById('player-name-input');
+        const gameOverPlayerEl = document.getElementById('game-over-player');
+        const leaderboardListEl = document.getElementById('leaderboard-list');
+        const gameoverLeaderboardListEl = document.getElementById('gameover-leaderboard-list');
+
+        function getHighScores() {
+            let scores = localStorage.getItem('zombies_killer_highscores');
+            if (!scores) {
+                return [
+                    { name: "HM-AURA", score: 500 },
+                    { name: "SHARJEEL", score: 300 },
+                    { name: "PLAYER", score: 100 }
+                ];
+            }
+            return JSON.parse(scores);
+        }
+
+        function saveHighScore(name, newScore) {
+            let scores = getHighScores();
+            scores.push({ name: name, score: newScore });
+            scores.sort((a, b) => b.score - a.score);
+            scores = scores.slice(0, 3); // Keep top 3
+            localStorage.setItem('zombies_killer_highscores', JSON.stringify(scores));
+            updateLeaderboardUI();
+        }
+
+        function updateLeaderboardUI() {
+            let scores = getHighScores();
+            let html = '';
+            scores.forEach((item, index) => {
+                let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
+                html += `<div class="leaderboard-item"><span>${medal} ${item.name}</span> <span>${item.score}</span></div>`;
+            });
+            leaderboardListEl.innerHTML = html;
+            gameoverLeaderboardListEl.innerHTML = html;
+        }
 
         function initBackgroundCanvasAnimation(canvasId, screenElement) {
             const canvas = document.getElementById(canvasId);
@@ -384,6 +476,7 @@
 
             initBackgroundCanvasAnimation('splash-canvas', splashScreen);
             initBackgroundCanvasAnimation('start-canvas', startScreen);
+            updateLeaderboardUI();
         });
 
         function initAudio() {
@@ -473,6 +566,10 @@
 
         function startGame() {
             initAudio();
+            
+            let enteredName = playerNameInput.value.trim();
+            currentPlayer = enteredName === "" ? "HM-AURA" : enteredName.toUpperCase();
+
             startScreen.style.display = 'none';
             gameOverScreen.style.display = 'none';
             hudEl.style.display = 'flex';
@@ -731,6 +828,9 @@
                         gameActive = false;
                         if (backgroundMusicInterval) clearInterval(backgroundMusicInterval);
                         hudEl.style.display = 'none';
+                        
+                        saveHighScore(currentPlayer, score);
+                        gameOverPlayerEl.textContent = currentPlayer;
                         finalScoreEl.textContent = score;
                         gameOverScreen.style.display = 'flex';
                     }
