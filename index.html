@@ -626,7 +626,17 @@
 
             window.addEventListener('resize', onWindowResize);
             window.addEventListener('pointerdown', onPointerDownHandler);
-            window.addEventListener('contextmenu', e => e.preventDefault());
+            
+            // Laptop Right-Click & Keyboard 'R' key support for reload
+            window.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                reloadWeapon();
+            });
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'r' || e.key === 'R') {
+                    reloadWeapon();
+                }
+            });
 
             animate();
         }
@@ -755,6 +765,7 @@
             if (!gameActive) return;
             if (e.target.closest('#hud') && !e.target.closest('#canvas-container')) return;
 
+            // Left Click or Touch
             if (e.button === 0 || e.pointerType === 'touch') {
                 if (ammo > 0) {
                     ammo--;
