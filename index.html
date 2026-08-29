@@ -39,7 +39,7 @@
         .top-bar {
             display: flex;
             justify-content: space-between;
-            font-size: clamp(1.2rem, 4vw, 2.2rem);
+            font-size: clamp(1.1rem, 3vw, 1.8rem);
             color: #ffff00;
             text-shadow: 2px 2px 0px #000, 0 0 8px rgba(0,0,0,0.9);
             width: 100%;
@@ -55,52 +55,49 @@
         .weapon-box {
             background: rgba(255, 255, 255, 0.9);
             border: 2px solid #ff3333;
-            padding: 10px 15px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
             color: #000;
             text-align: right;
-            max-width: 50vw;
         }
         .weapon-name {
-            font-size: clamp(0.7rem, 2vw, 1.2rem);
+            font-size: clamp(0.6rem, 1.5vw, 0.9rem);
             color: #ff4444;
             letter-spacing: 1px;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
         .ammo-display {
-            font-size: clamp(1.4rem, 5vw, 3rem);
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
             color: #222;
             text-shadow: 1px 1px #fff;
             letter-spacing: 1px;
             white-space: nowrap;
         }
         .reload-prompt {
-            font-size: clamp(0.9rem, 2.5vw, 1.6rem);
+            font-size: clamp(0.8rem, 2vw, 1.2rem);
             color: #fff;
             background: rgba(180, 0, 0, 0.95);
             border: 2px solid #ffff00;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 6px 10px;
+            border-radius: 5px;
             display: none;
             animation: blink 0.35s infinite alternate;
-            box-shadow: 0 0 15px rgba(255,0,0,0.8);
-            margin-bottom: 8px;
+            box-shadow: 0 0 10px rgba(255,0,0,0.8);
+            margin-bottom: 6px;
             text-align: center;
         }
         .screen-reload-btn {
             background: linear-gradient(to bottom, #cc0000, #660000);
             color: #fff;
             border: 2px solid #ffff00;
-            padding: 10px 20px;
-            font-size: clamp(1rem, 3.5vw, 1.8rem);
+            padding: 8px 16px;
+            font-size: clamp(0.9rem, 2.5vw, 1.4rem);
             font-family: inherit;
             cursor: pointer;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(255,0,0,0.8);
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(255,0,0,0.8);
             letter-spacing: 1px;
             font-weight: bold;
             transition: transform 0.1s;
@@ -163,75 +160,63 @@
             background: radial-gradient(circle, #3a6b4c 0%, #0e2417 90%);
         }
         .splash-logo-img {
-            max-width: min(350px, 80vw);
+            max-width: min(300px, 75vw);
             width: 100%;
             height: auto;
-            border-radius: 12px;
-            box-shadow: 0 0 25px rgba(0, 150, 50, 0.7);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 150, 50, 0.7);
             border: 3px solid #2ecc71;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: block;
         }
         .splash-dev {
-            font-size: clamp(1rem, 3.5vw, 1.6rem);
+            font-size: clamp(0.9rem, 3vw, 1.4rem);
             color: #ffcc00;
-            text-shadow: 2px 2px #000, 0 0 10px rgba(255,204,0,0.5);
-            margin-bottom: 12px;
+            text-shadow: 2px 2px #000, 0 0 8px rgba(255,204,0,0.5);
+            margin-bottom: 10px;
             letter-spacing: 2px;
         }
         .splash-rights {
-            font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+            font-size: clamp(0.7rem, 2vw, 1rem);
             color: #dddddd;
             letter-spacing: 1.5px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             text-shadow: 1px 1px #000;
         }
         h1 {
-            font-size: clamp(2.5rem, 10vw, 5.5rem);
+            font-size: clamp(2.2rem, 8vw, 4.5rem);
             color: #ff3333;
-            text-shadow: 4px 4px #000, 0 0 20px #990000;
-            margin: 0 0 10px 0;
+            text-shadow: 4px 4px #000, 0 0 15px #990000;
+            margin: 0 0 8px 0;
             letter-spacing: 2px;
         }
         p {
-            font-size: clamp(1rem, 3.5vw, 1.6rem);
+            font-size: clamp(0.9rem, 3vw, 1.4rem);
             letter-spacing: 1px;
             color: #f0f0f0;
             text-shadow: 2px 2px #000;
-            margin: 5px 0;
+            margin: 4px 0;
         }
         .arcade-btn {
             background: linear-gradient(to bottom, #2ecc71, #27ae60);
             color: #fff;
             border: 3px solid #ffff00;
-            padding: 14px 30px;
-            font-size: clamp(1.2rem, 4.5vw, 2.2rem);
+            padding: 12px 25px;
+            font-size: clamp(1.1rem, 4vw, 1.8rem);
             font-family: inherit;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(46,204,113,0.8);
-            margin-top: 15px;
+            box-shadow: 0 0 15px rgba(46,204,113,0.8);
+            margin-top: 12px;
             letter-spacing: 2px;
             font-weight: bold;
             transition: transform 0.15s, background 0.2s;
             width: 100%;
-            max-width: 320px;
+            max-width: 280px;
         }
         .arcade-btn:hover {
             background: linear-gradient(to bottom, #27ae60, #1e8449);
             transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(46,204,113,1);
-        }
-
-        @media (max-width: 600px) {
-            #hud {
-                padding: 10px;
-            }
-            .weapon-box {
-                padding: 6px 10px;
-            }
-            .screen-reload-btn {
-                padding: 8px 14px;
-            }
+            box-shadow: 0 0 25px rgba(46,204,113,1);
         }
     </style>
 
@@ -249,12 +234,12 @@
         </div>
         <div class="bottom-bar">
             <div>
-                <div id="reload-warning" class="reload-prompt">⚠️ TAP RELOAD ⚠️</div>
+                <div id="reload-warning" class="reload-prompt">⚠️ RELOAD ⚠️</div>
                 <button class="screen-reload-btn" onclick="reloadWeapon()">🔄 RELOAD</button>
             </div>
             <div class="weapon-box">
-                <div class="weapon-name">ASSAULT RIFLE [AK-47]</div>
-                <div class="ammo-display">AMMO: <span id="ammo">30</span>/30</div>
+                <div class="weapon-name">AK-47 RIFLE</div>
+                <div class="ammo-display"><span id="ammo">30</span>/30</div>
             </div>
         </div>
     </div>
@@ -276,14 +261,14 @@
         <div class="screen-content">
             <h1>ZOMBIES KILLER</h1>
             <p>DAYLIGHT GARDEN EDITION</p>
-            <p style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); color: #ffff00; margin-top: 10px;">Tap/Click to Shoot | Use Reload Button</p>
+            <p style="font-size: clamp(0.8rem, 2vw, 1rem); color: #ffff00; margin-top: 8px;">Tap/Click to Shoot | Use Reload Button</p>
             <button class="arcade-btn" onclick="startGame()">START MISSION</button>
         </div>
     </div>
 
     <!-- Game Over Screen -->
     <div id="game-over-screen" class="screen" style="display: none;">
-        <h1 style="color: #ff2222; text-shadow: 0 0 20px #990000;">YOU DIED</h1>
+        <h1 style="color: #ff2222; text-shadow: 0 0 15px #990000;">YOU DIED</h1>
         <p>Final Score: <span id="final-score">0</span></p>
         <button class="arcade-btn" onclick="startGame()">PLAY AGAIN</button>
     </div>
@@ -392,7 +377,7 @@
             canvasImg.onerror = function() {
                 img.style.display = 'none';
                 let fallbackBox = document.createElement('div');
-                fallbackBox.style.cssText = "font-size: 2.2rem; font-weight: bold; color: #2ecc71; text-shadow: 0 0 15px rgba(0,255,0,0.8); margin-bottom: 20px; letter-spacing: 3px; border: 3px solid #2ecc71; padding: 12px 20px; border-radius: 12px; background: rgba(0,0,0,0.8);";
+                fallbackBox.style.cssText = "font-size: 1.8rem; font-weight: bold; color: #2ecc71; text-shadow: 0 0 12px rgba(0,255,0,0.8); margin-bottom: 15px; letter-spacing: 3px; border: 2px solid #2ecc71; padding: 10px 20px; border-radius: 10px; background: rgba(0,0,0,0.8);";
                 fallbackBox.innerHTML = "HM AURA";
                 splashScreen.querySelector('.screen-content').insertBefore(fallbackBox, img);
             };
@@ -671,7 +656,6 @@
 
         function onPointerDownHandler(e) {
             if (!gameActive) return;
-            // Ignore clicks if touching buttons inside UI container
             if (e.target.closest('#hud') && !e.target.closest('#canvas-container')) return;
 
             if (e.button === 0 || e.pointerType === 'touch') {
