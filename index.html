@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zombies Killer - Daylight Garden Edition</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #87CEEB;
+            font-family: 'Impact', Charcoal, sans-serif;
+            color: #333;
+            cursor: crosshair;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30px;
+            z-index: 10;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 2.2rem;
+            color: #ffff00;
+            text-shadow: 3px 3px 0px #000, 0 0 10px rgba(0,0,0,0.9);
+        }
+        .bottom-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+        }
+        .weapon-box {
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #ff3333;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            color: #000;
+        }
+        .weapon-name {
+            font-size: 1.2rem;
+            color: #ff4444;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        .ammo-display {
+            font-size: 3rem;
+            color: #222;
+            text-shadow: 1px 1px #fff;
+            letter-spacing: 1px;
+        }
+        .reload-prompt {
+            font-size: 1.6rem;
+            color: #fff;
+            background: rgba(180, 0, 0, 0.95);
+            border: 2px solid #ffff00;
+            padding: 10px 20px;
+            border-radius: 6px;
+            display: none;
+            animation: blink 0.35s infinite alternate;
+            box-shadow: 0 0 20px rgba(255,0,0,0.8);
+        }
+        .screen-reload-btn {
+            background: linear-gradient(to bottom, #cc0000, #660000);
+            color: #fff;
+            border: 3px solid #ffff00;
+            padding: 15px 30px;
+            font-size: 1.8rem;
+            font-family: inherit;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(255,0,0,0.8);
+            letter-spacing: 2px;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+        .screen-reload-btn:active {
+            transform: scale(0.95);
+        }
+        @keyframes blink {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0.4; transform: scale(1.04); }
+        }
+        #flash {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 0, 0, 0.4);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.06s ease;
+            z-index: 5;
+        }
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #87CEEB 0%, #2e8b57 90%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            cursor: default;
+            overflow: hidden;
+        }
+        .horror-bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .screen-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #splash-screen {
+            background: #1a3a2a;
+            z-index: 30;
+            transition: opacity 0.8s ease;
+        }
+        #start-screen {
+            background: radial-gradient(circle, #3a6b4c 0%, #0e2417 90%);
+        }
+        .splash-logo-img {
+            max-width: 420px;
+            width: 85%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 0 35px rgba(0, 150, 50, 0.7);
+            border: 3px solid #2ecc71;
+            margin-bottom: 25px;
+            display: block;
+        }
+        .splash-dev {
+            font-size: 1.6rem;
+            color: #ffcc00;
+            text-shadow: 2px 2px #000, 0 0 10px rgba(255,204,0,0.5);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+        .splash-rights {
+            font-size: 1.1rem;
+            color: #dddddd;
+            letter-spacing: 1.5px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px #000;
+        }
+        h1 {
+            font-size: 5.5rem;
+            color: #ff3333;
+            text-shadow: 5px 5px #000, 0 0 25px #990000;
+            margin: 0 0 10px 0;
+            letter-spacing: 3px;
+            text-align: center;
+        }
+        p {
+            font-size: 1.6rem;
+            letter-spacing: 1.5px;
+            color: #f0f0f0;
+            text-shadow: 2px 2px #000;
+        }
+        .arcade-btn {
+            background: linear-gradient(to bottom, #2ecc71, #27ae60);
+            color: #fff;
+            border: 3px solid #ffff00;
+            padding: 18px 45px;
+            font-size: 2.2rem;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(46,204,113,0.8);
+            margin-top: 15px;
+            letter-spacing: 2px;
+            font-weight: bold;
+            transition: transform 0.15s, background 0.2s;
+        }
+        .arcade-btn:hover {
+            background: linear-gradient(to bottom, #27ae60, #1e8449);
+            transform: scale(1.08);
+            box-shadow: 0 0 35px rgba(46,204,113,1);
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+    <div id="flash"></div>
+
+    <div id="hud" style="display: none;">
+        <div class="top-bar">
+            <div>SCORE: <span id="score">000000</span></div>
+            <div>LIVES: <span id="lives">❤️❤️❤️</span></div>
+        </div>
+        <div class="bottom-bar">
+            <div>
+                <div id="reload-warning" class="reload-prompt" style="margin-bottom: 10px;">⚠️ TAP RELOAD OR RIGHT-CLICK ⚠️</div>
+                <button class="screen-reload-btn" onclick="reloadWeapon()">🔄 RELOAD</button>
+            </div>
+            <div class="weapon-box">
+                <div class="weapon-name">ASSAULT RIFLE [AK-47]</div>
+                <div class="ammo-display">AMMO: <span id="ammo">30</span>/30</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="screen">
+        <canvas id="splash-canvas" class="horror-bg-canvas"></canvas>
+        <div class="screen-content">
+            <img id="logo-img" src="data:image/jpeg;base64," alt="HM AURA Logo" class="splash-logo-img">
+            <div class="splash-dev">DEVELOPED BY SHARJEEL SIDDIQUI</div>
+            <div class="splash-rights">ALL RIGHTS RESERVED © 2026</div>
+            <button class="arcade-btn" onclick="enterStartMenu()">ENTER GAME</button>
+        </div>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen" style="display: none;">
+        <canvas id="start-canvas" class="horror-bg-canvas"></canvas>
+        <div class="screen-content">
+            <h1>ZOMBIES KILLER</h1>
+            <p>DAYLIGHT GARDEN EDITION</p>
+            <p style="font-size: 1.1rem; color: #ffff00; margin-top: 15px;">Tap/Click to Shoot | Use Reload Button for Mobile</p>
+            <button class="arcade-btn" onclick="startGame()">START MISSION</button>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen" class="screen" style="display: none;">
+        <h1 style="color: #ff2222; text-shadow: 0 0 20px #990000;">YOU DIED</h1>
+        <p>Final Score: <span id="final-score">0</span></p>
+        <button class="arcade-btn" onclick="startGame()">PLAY AGAIN</button>
+    </div>
+
+    <script>
+        let scene, camera, renderer;
+        let enemies = [];
+        let backgroundBirds = [];
+        let score = 0;
+        let lives = 3;
+        let maxAmmo = 30;
+        let ammo = 30;
+        let gameActive = false;
+        let raycaster, mouse;
+        let audioCtx = null;
+        let backgroundMusicInterval = null;
+        let spawnTimer = 0;
+        let birdSpawnTimer = 0;
+
+        const scoreEl = document.getElementById('score');
+        const livesEl = document.getElementById('lives');
+        const ammoEl = document.getElementById('ammo');
+        const finalScoreEl = document.getElementById('final-score');
+        const splashScreen = document.getElementById('splash-screen');
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const hudEl = document.getElementById('hud');
+        const flashScreen = document.getElementById('flash');
+        const reloadWarning = document.getElementById('reload-warning');
+
+        function initBackgroundCanvasAnimation(canvasId, screenElement) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            let leaves = [];
+            class Leaf {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = -20;
+                    this.size = 8 + Math.random() * 12;
+                    this.speedY = 1 + Math.random() * 2;
+                    this.speedX = (Math.random() - 0.5) * 1.5;
+                    this.angle = Math.random() * Math.PI;
+                    this.spin = (Math.random() - 0.5) * 0.05;
+                    this.color = Math.random() < 0.5 ? '#2ecc71' : '#27ae60';
+                }
+                update() {
+                    this.y += this.speedY;
+                    this.x += this.speedX + Math.sin(this.y * 0.02);
+                    this.angle += this.spin;
+                }
+                draw(c) {
+                    c.save();
+                    c.translate(this.x, this.y);
+                    c.rotate(this.angle);
+                    c.fillStyle = this.color;
+                    c.beginPath();
+                    c.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2);
+                    c.fill();
+                    c.restore();
+                }
+            }
+
+            setInterval(() => {
+                if (screenElement.style.display !== 'none') {
+                    leaves.push(new Leaf());
+                }
+            }, 200);
+
+            function animate() {
+                if (screenElement.style.display !== 'none') {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    for (let i = leaves.length - 1; i >= 0; i--) {
+                        leaves[i].update();
+                        leaves[i].draw(ctx);
+                        if (leaves[i].y > canvas.height + 20) {
+                            leaves.splice(i, 1);
+                        }
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const img = document.getElementById('logo-img');
+            const canvasImg = new Image();
+            canvasImg.crossOrigin = "anonymous";
+            canvasImg.src = "https://i.ibb.co/3ykS5S7/WhatsApp-Image-2026-08-04-at-1-29-58-PM.jpg";
+            canvasImg.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = canvasImg.width;
+                canvas.height = canvasImg.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(canvasImg, 0, 0);
+                img.src = canvas.toDataURL('image/jpeg');
+            };
+            canvasImg.onerror = function() {
+                img.style.display = 'none';
+                let fallbackBox = document.createElement('div');
+                fallbackBox.style.cssText = "font-size: 2.8rem; font-weight: bold; color: #2ecc71; text-shadow: 0 0 15px rgba(0,255,0,0.8); margin-bottom: 25px; letter-spacing: 3px; border: 3px solid #2ecc71; padding: 15px 30px; border-radius: 12px; background: rgba(0,0,0,0.8);";
+                fallbackBox.innerHTML = "HM AURA";
+                splashScreen.querySelector('.screen-content').insertBefore(fallbackBox, img);
+            };
+
+            initBackgroundCanvasAnimation('splash-canvas', splashScreen);
+            initBackgroundCanvasAnimation('start-canvas', startScreen);
+        });
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function enterStartMenu() {
+            initAudio();
+            splashScreen.style.display = 'none';
+            startScreen.style.display = 'flex';
+        }
+
+        // Higher Volume & Clear Background Music 
+        function startActionMusic() {
+            if (backgroundMusicInterval) clearInterval(backgroundMusicInterval);
+            
+            const notes = [261.63, 329.63, 392.00, 523.25, 440.00, 349.23];
+            let step = 0;
+
+            backgroundMusicInterval = setInterval(() => {
+                if (!gameActive || !audioCtx) return;
+
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(notes[step], audioCtx.currentTime);
+
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.35, audioCtx.currentTime + 0.1);
+                gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.45);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.45);
+
+                step = (step + 1) % notes.length;
+            }, 300);
+        }
+
+        // Extremely Loud and Punchy Gunshot Sound
+        function playHeavyGunshotSound() {
+            if (!audioCtx) return;
+            
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(550, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(15, audioCtx.currentTime + 0.3);
+            
+            gain.gain.setValueAtTime(1.5, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function playReloadSound() {
+            if (!audioCtx) return;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(1000, audioCtx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function reloadWeapon() {
+            if (!gameActive) return;
+            ammo = maxAmmo;
+            ammoEl.textContent = ammo;
+            reloadWarning.style.display = 'none';
+            playReloadSound();
+        }
+
+        function startGame() {
+            initAudio();
+            startScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+            hudEl.style.display = 'flex';
+            
+            score = 0;
+            lives = 3;
+            ammo = maxAmmo;
+            scoreEl.textContent = '000000';
+            livesEl.textContent = '❤️❤️❤️';
+            ammoEl.textContent = ammo;
+            
+            for (let en of enemies) {
+                scene.remove(en.mesh);
+            }
+            enemies = [];
+
+            for (let b of backgroundBirds) {
+                scene.remove(b.mesh);
+            }
+            backgroundBirds = [];
+
+            gameActive = true;
+            startActionMusic();
+
+            if (!renderer) {
+                init();
+            }
+        }
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB);
+            scene.fog = new THREE.FogExp2(0x87CEEB, 0.008);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 1.6, 5);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+            scene.add(ambientLight);
+
+            const sunLight = new THREE.DirectionalLight(0xfffaed, 1.5);
+            sunLight.position.set(20, 40, 20);
+            scene.add(sunLight);
+
+            createGardenEnvironment();
+
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('mousedown', onMouseDownHandler);
+            window.addEventListener('contextmenu', e => e.preventDefault());
+
+            animate();
+        }
+
+        function createGardenEnvironment() {
+            const floorGeo = new THREE.PlaneGeometry(60, 120);
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0x3b7a57, roughness: 0.9 });
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            floor.position.z = -40;
+            scene.add(floor);
+
+            const mountainMat = new THREE.MeshStandardMaterial({ color: 0x4f7942, roughness: 0.9 });
+            for (let i = -3; i <= 3; i++) {
+                const mGeo = new THREE.ConeGeometry(12 + Math.random() * 6, 20 + Math.random() * 10, 4);
+                const mountain = new THREE.Mesh(mGeo, mountainMat);
+                mountain.position.set(i * 15, 8, -80);
+                scene.add(mountain);
+            }
+
+            for (let z = -10; z > -90; z -= 12) {
+                createTree(-12, z);
+                createTree(12, z);
+            }
+        }
+
+        function createTree(x, z) {
+            const trunkGeo = new THREE.CylinderGeometry(0.8, 1.2, 5, 6);
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+            const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+            trunk.position.set(x, 2.5, z);
+            scene.add(trunk);
+
+            const leavesGeo = new THREE.SphereGeometry(3.5, 8, 8);
+            const leavesMat = new THREE.MeshStandardMaterial({ color: 0x228B22 });
+            const leaves = new THREE.Mesh(leavesGeo, leavesMat);
+            leaves.position.set(x, 6, z);
+            scene.add(leaves);
+        }
+
+        function createEmojiSprite(emojiText, scaleSize = 3.8) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 256, 256);
+            ctx.font = '180px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(emojiText, 128, 128);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.set(scaleSize, scaleSize, scaleSize);
+            return sprite;
+        }
+
+        class BackgroundBird {
+            constructor() {
+                this.mesh = createEmojiSprite('🐦', 2.0);
+                let startX = (Math.random() - 0.5) * 50;
+                let startY = 10 + Math.random() * 12;
+                let startZ = -35 - Math.random() * 30;
+                this.mesh.position.set(startX, startY, startZ);
+                
+                this.velocityX = (Math.random() - 0.5) * 0.2;
+                this.velocityY = (Math.random() - 0.5) * 0.05;
+                this.velocityZ = 0.15 + Math.random() * 0.25;
+                this.wobbleSpeed = 0.06 + Math.random() * 0.06;
+                this.wobbleTimer = Math.random() * Math.PI;
+                
+                scene.add(this.mesh);
+            }
+            update() {
+                this.wobbleTimer += this.wobbleSpeed;
+                this.mesh.position.x += this.velocityX + Math.sin(this.wobbleTimer) * 0.1;
+                this.mesh.position.y += this.velocityY + Math.cos(this.wobbleTimer) * 0.05;
+                this.mesh.position.z += this.velocityZ;
+            }
+        }
+
+        class EmojiZombie {
+            constructor() {
+                this.mesh = createEmojiSprite('🧟', 3.8);
+                this.mesh.position.set((Math.random() - 0.5) * 8, 1.8, -45 - Math.random() * 15);
+                this.speed = 1.15 + Math.random() * 0.35;
+                scene.add(this.mesh);
+            }
+            update() {
+                this.mesh.position.z += this.speed;
+            }
+        }
+
+        class EmojiSkeleton {
+            constructor() {
+                this.mesh = createEmojiSprite('💀', 3.8);
+                this.mesh.position.set((Math.random() - 0.5) * 8, 1.8, -45 - Math.random() * 15);
+                this.speed = 1.35 + Math.random() * 0.40;
+                scene.add(this.mesh);
+            }
+            update() {
+                this.mesh.position.z += this.speed;
+            }
+        }
+
+        function spawnEnemyWave() {
+            for (let i = 0; i < 3; i++) {
+                if (Math.random() < 0.5) {
+                    enemies.push(new EmojiZombie());
+                } else {
+                    enemies.push(new EmojiSkeleton());
+                }
+            }
+        }
+
+        function onWindowResize() {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        }
+
+        function onMouseDownHandler(e) {
+            if (!gameActive) return;
+
+            if (e.button === 0) {
+                if (ammo > 0) {
+                    ammo--;
+                    ammoEl.textContent = ammo;
+                    playHeavyGunshotSound();
+
+                    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+                    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+                    raycaster.setFromCamera(mouse, camera);
+
+                    const intersects = raycaster.intersectObjects(enemies.map(en => en.mesh));
+                    if (intersects.length > 0) {
+                        const hitSprite = intersects[0].object;
+                        const found = enemies.find(en => en.mesh === hitSprite);
+                        if (found) {
+                            scene.remove(found.mesh);
+                            enemies = enemies.filter(en => en !== found);
+                            score += 100;
+                            scoreEl.textContent = String(score).padStart(6, '0');
+                        }
+                    }
+
+                    if (ammo === 0) {
+                        reloadWarning.style.display = 'block';
+                    }
+                }
+            } else if (e.button === 2) {
+                reloadWeapon();
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (!gameActive || !renderer) return;
+
+            // Spawn Zombies/Skeletons
+            spawnTimer++;
+            if (spawnTimer > 50) {
+                spawnEnemyWave();
+                spawnTimer = 0;
+            }
+
+            // High Frequency / Increased Count of Flying Birds in Background Sky
+            birdSpawnTimer++;
+            if (birdSpawnTimer > 15 && backgroundBirds.length < 20) {
+                backgroundBirds.push(new BackgroundBird());
+                birdSpawnTimer = 0;
+            }
+
+            for (let i = backgroundBirds.length - 1; i >= 0; i--) {
+                let bird = backgroundBirds[i];
+                bird.update();
+                if (bird.mesh.position.z > 10 || bird.mesh.position.y > 40) {
+                    scene.remove(bird.mesh);
+                    backgroundBirds.splice(i, 1);
+                }
+            }
+
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let en = enemies[i];
+                en.update();
+
+                if (en.mesh.position.z > 3.8) {
+                    scene.remove(en.mesh);
+                    enemies.splice(i, 1);
+                    lives--;
+                    let hearts = '';
+                    for (let h = 0; h < lives; h++) hearts += '❤️';
+                    livesEl.textContent = hearts;
+
+                    flashScreen.style.opacity = '1';
+                    setTimeout(() => { flashScreen.style.opacity = '0'; }, 80);
+
+                    if (lives <= 0) {
+                        gameActive = false;
+                        if (backgroundMusicInterval) clearInterval(backgroundMusicInterval);
+                        hudEl.style.display = 'none';
+                        finalScoreEl.textContent = score;
+                        gameOverScreen.style.display = 'flex';
+                    }
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+</html>
