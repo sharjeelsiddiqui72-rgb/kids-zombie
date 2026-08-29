@@ -387,7 +387,6 @@
             startScreen.style.display = 'flex';
         }
 
-        // Higher Volume & Clear Background Music 
         function startActionMusic() {
             if (backgroundMusicInterval) clearInterval(backgroundMusicInterval);
             
@@ -417,7 +416,6 @@
             }, 300);
         }
 
-        // Extremely Loud and Punchy Gunshot Sound
         function playHeavyGunshotSound() {
             if (!audioCtx) return;
             
@@ -604,7 +602,7 @@
             constructor() {
                 this.mesh = createEmojiSprite('🧟', 3.8);
                 this.mesh.position.set((Math.random() - 0.5) * 8, 1.8, -45 - Math.random() * 15);
-                this.speed = 1.15 + Math.random() * 0.35;
+                this.speed = 0.5 + Math.random() * 0.2; // Speed slow kar di gayi hai
                 scene.add(this.mesh);
             }
             update() {
@@ -616,7 +614,7 @@
             constructor() {
                 this.mesh = createEmojiSprite('💀', 3.8);
                 this.mesh.position.set((Math.random() - 0.5) * 8, 1.8, -45 - Math.random() * 15);
-                this.speed = 1.35 + Math.random() * 0.40;
+                this.speed = 0.6 + Math.random() * 0.25; // Speed slow kar di gayi hai
                 scene.add(this.mesh);
             }
             update() {
@@ -680,14 +678,12 @@
             requestAnimationFrame(animate);
             if (!gameActive || !renderer) return;
 
-            // Spawn Zombies/Skeletons
             spawnTimer++;
             if (spawnTimer > 50) {
                 spawnEnemyWave();
                 spawnTimer = 0;
             }
 
-            // High Frequency / Increased Count of Flying Birds in Background Sky
             birdSpawnTimer++;
             if (birdSpawnTimer > 15 && backgroundBirds.length < 20) {
                 backgroundBirds.push(new BackgroundBird());
